@@ -79,7 +79,7 @@ Create a `config.json` file in the root directory with the following structure:
 1. **Clone the Repository**:
 
    ```sh
-   git clone https://github.com/yourusername/self-healing-server.git
+   git clone https://github.com/tanm-sys/self-healing-server.git
    cd self-healing-server
    ```
 
