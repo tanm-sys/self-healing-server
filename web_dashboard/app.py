@@ -1,15 +1,23 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 import sqlite3
+import structlog
+
+logger = structlog.get_logger()
 
 app = Flask(__name__)
+DATABASE = 'web_dashboard/health_data.db'
+
+def get_db_connection():
+    conn = sqlite3.connect(DATABASE)
+    conn.row_factory = sqlite3.Row
+    return conn
 
 @app.route('/')
-def dashboard():
-    conn = sqlite3.connect('data/health_data.db')  # Adjusted to correct path
-    cursor = conn.cursor()
-    cursor.execute('SELECT * FROM health_data ORDER BY timestamp DESC LIMIT 10')
-    data = cursor.fetchall()
-    return render_template('dashboard.html', data=data)
+def index():
+    conn = get_db_connection()
+    data = conn.execute('SELECT * FROM health_data').fetchall()
+    conn.close()
+    return render_template('index.html', data=data)
 
-if __name__ == "__main__":
-    app.run(port=5000)
+if __name__ == '__main__':
+    app.run(debug=True)
