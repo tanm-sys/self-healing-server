@@ -1,32 +1,43 @@
 import asyncio
-from adaptive_health_checks import adaptive_cpu_check, adaptive_memory_check, adaptive_disk_check, adaptive_response_time_check
-from anomaly_detection import detect_anomalies
-from prometheus_metrics import start_prometheus_server
+import json
+from health_checks import perform_health_checks
+from adaptive_health_checks import AdaptiveHealthChecks
+from anomaly_detection import AnomalyDetection
+from service_manager import ServiceManager
+from alerts import AlertManager
 from logging_setup import setup_logging
-from error_handling import handle_exception
-from distributed_monitoring import monitor_servers, load_config
+from distributed_monitoring import DistributedMonitoring
+from prometheus_metrics import PrometheusMetrics
+from historical_data import HistoricalData
 
-def main():
+async def main():
+    with open('config.json') as config_file:
+        config = json.load(config_file)
+
     setup_logging()
-    start_prometheus_server()
+    adaptive_health_checks = AdaptiveHealthChecks(config)
+    anomaly_detection = AnomalyDetection(config['ml_model_path'])
+    service_manager = ServiceManager()
+    alert_manager = AlertManager(config['alert_email'])
+    prometheus_metrics = PrometheusMetrics()
+    distributed_monitoring = DistributedMonitoring(config['server_urls'])
+    historical_data = HistoricalData(config['historical_data_db'])
 
-    config = load_config()
-    server_urls = config["server_urls"]
+    while True:
+        health_data = await perform_health_checks(config)
+        adaptive_health_checks.adjust_thresholds(health_data)
+        anomalies = anomaly_detection.detect_anomalies(health_data)
+        
+        historical_data.store_data(health_data)  # Store the health data
 
-    async def periodic_health_checks():
-        while True:
-            await asyncio.gather(
-                adaptive_cpu_check(),
-                adaptive_memory_check(),
-                adaptive_disk_check(),
-                adaptive_response_time_check(),
-                monitor_servers(server_urls)
-            )
-            detect_anomalies()
-            await asyncio.sleep(config["check_interval"])
+        if anomalies:
+            alert_manager.send_alert(str(anomalies))
+            service_manager.restart_services(anomalies)
 
-    asyncio.run(periodic_health_checks())
+        prometheus_metrics.update_metrics(health_data)
+        distributed_monitoring.collect_data()
+        
+        await asyncio.sleep(config['check_interval'])
 
 if __name__ == "__main__":
-    main()
-  
+    asyncio.run(main())
