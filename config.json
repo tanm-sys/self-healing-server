@@ -1,0 +1,10 @@
+{
+  "server_urls": [
+    "http://localhost:8000/health"
+  ],
+  "cpu_threshold": 80,
+  "memory_threshold": 80,
+  "disk_threshold": 90,
+  "response_time_threshold": 2.0,
+  "check_interval": 60
+}
