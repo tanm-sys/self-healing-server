@@ -1,12 +1,15 @@
-import pickle
 import numpy as np
+import structlog
+from sklearn.ensemble import IsolationForest
 
-class AnomalyDetection:
-    def __init__(self, model_path):
-        with open(model_path, 'rb') as model_file:
-            self.model = pickle.load(model_file)
+logger = structlog.get_logger()
 
-    def detect_anomalies(self, health_data):
-        data = np.array([health_data['cpu_usage'], health_data['memory_usage'], health_data['disk_usage'], health_data['response_time']]).reshape(1, -1)
-        anomalies = self.model.predict(data)
+def detect_anomalies(data):
+    try:
+        clf = IsolationForest(contamination=0.1)
+        preds = clf.fit_predict(data)
+        anomalies = np.where(preds == -1)[0]
         return anomalies
+    except Exception as e:
+        logger.error("Failed to detect anomalies", error=str(e))
+        return []
