@@ -1,4 +1,6 @@
-import logging
+import structlog
+
+logger = structlog.get_logger()
 
 def handle_error(error):
-    logging.error(f"An error occurred: {error}")
+    logger.error(f"Error occurred: {error}")
