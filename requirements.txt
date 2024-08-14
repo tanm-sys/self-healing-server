@@ -1,0 +1,7 @@
+psutil
+aiohttp
+numpy
+prometheus_client
+flask
+sqlite3
+scikit-learn
