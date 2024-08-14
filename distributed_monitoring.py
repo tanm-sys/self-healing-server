@@ -1,16 +1,14 @@
 import aiohttp
 import asyncio
+import structlog
 
-class DistributedMonitoring:
-    def __init__(self, server_urls):
-        self.server_urls = server_urls
+logger = structlog.get_logger()
 
-    async def collect_data(self):
-        async with aiohttp.ClientSession() as session:
-            tasks = [self.fetch_health_data(session, url) for url in self.server_urls]
-            results = await asyncio.gather(*tasks)
-            return results
-
-    async def fetch_health_data(self, session, url):
-        async with session.get(url) as response:
-            return await response.json()
+async def monitor_servers(server_urls):
+    async with aiohttp.ClientSession() as session:
+        for url in server_urls:
+            try:
+                async with session.get(url) as response:
+                    logger.info(f"Monitored {url} with status {response.status}")
+            except Exception as e:
+                logger.error(f"Failed to monitor {url}", error=str(e))
