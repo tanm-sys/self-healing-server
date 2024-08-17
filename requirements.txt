@@ -4,3 +4,4 @@ numpy
 prometheus_client
 flask
 scikit-learn
+config
