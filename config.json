@@ -1,14 +1,16 @@
 {
-  "server_urls": [
-    "http://localhost:8000/health"
-  ],
-  "cpu_threshold": 80,
-  "memory_threshold": 80,
-  "disk_threshold": 90,
-  "response_time_threshold": 2.0,
-  "check_interval": 60,
-  "alert_email": "admin@example.com",
-  "ml_model_path": "models/anomaly_detector.pkl",
-  "historical_data_db": "data/health_data.db",
-  "dashboard_port": 5000
+    "server_urls": [
+        "http://localhost:8000/health"
+    ],
+    "cpu_threshold": 80,
+    "memory_threshold": 80,
+    "disk_threshold": 90,
+    "response_time_threshold": 2.0,
+    "check_interval": 60,
+    "alert_email": "rohanbelsare113@gmail.com",
+    "ml_model_path": "models/anomaly_detector.pkl",
+    "historical_data_db": "data/health_data.db",
+    "dashboard_port": 5000,
+    "log_level": "INFO",
+    "prometheus_port": 8001  
 }
